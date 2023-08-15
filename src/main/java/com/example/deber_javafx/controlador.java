@@ -86,10 +86,57 @@ public class controlador {
     }
 
     private void actualizarRegistro() {
+        int codigo = Integer.parseInt(codigot.getText());
+        int cedula = Integer.parseInt(cedulat.getText());
+        String nombre = nombret.getText();
+        String fecha = fechat.getText();
+
+        estudiante Est1 = new estudiante(codigo, cedula, nombre, fecha);
+
+        try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS)) {
+            String SQL_QUERY_UPDATE = "UPDATE est_prueba2 SET cedula=?, nombre=?, fecha_nac=? WHERE codigo_est=?";
+            try (PreparedStatement pstmt = conn.prepareStatement(SQL_QUERY_UPDATE)) {
+                pstmt.setInt(1, Est1.getCed());
+                pstmt.setString(2, Est1.getNombre());
+                pstmt.setString(3, Est1.getFecha());
+                pstmt.setInt(4, Est1.getCod());
+
+                int filasActualizadas = pstmt.executeUpdate();
+                if (filasActualizadas > 0) {
+                    mostrarMensajeExito("Estudiante actualizado con éxito");
+                } else {
+                    mostrarMensajeError("Error al actualizar el estudiante");
+                }
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
 
     }
 
     private void borrarRegistro() {
+        int codigo = Integer.parseInt(codigot.getText());
+
+        estudiante Est1 = new estudiante(codigo, 0, "", "");
+
+        try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS)) {
+            String SQL_QUERY_DELETE = "DELETE FROM est_prueba2 WHERE codigo_est=?";
+            try (PreparedStatement pstmt = conn.prepareStatement(SQL_QUERY_DELETE)) {
+                pstmt.setInt(1, Est1.getCod());
+                int filasEliminadas = pstmt.executeUpdate();
+                if (filasEliminadas > 0) {
+                    mostrarMensajeExito("Estudiante eliminado con éxito");
+                    codigot.setText("");
+                    cedulat.setText("");
+                    nombret.setText("");
+                    fechat.setText("");
+                } else {
+                    mostrarMensajeError("No se encontró el estudiante para eliminar");
+                }
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
 
     }
 
