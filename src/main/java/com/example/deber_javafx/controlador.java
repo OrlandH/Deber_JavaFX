@@ -30,7 +30,7 @@ public class controlador {
     private Button limpiarElFormularioButton;
     private static final String DB_URL = "jdbc:mysql://localhost/POOPRUEBA2";
     private static final String USER = "root";
-    private static final String PASS = "24@Diolove";
+    private static final String PASS = "root_bas3";
     private void mostrarMensajeExito(String mensaje) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Éxito");
@@ -94,10 +94,44 @@ public class controlador {
     }
 
     private void ingresarRegistro() {
+        int codigo = Integer.parseInt(codigot.getText());
+        int cedula = Integer.parseInt(cedulat.getText());
+        String nombre = nombret.getText();
+        String fecha = fechat.getText();
 
+        estudiante Est1 = new estudiante(codigo, cedula, nombre, fecha);
+
+        try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS)) {
+            String SQL_QUERY = "INSERT INTO est_prueba2 (codigo_est, cedula, nombre, fecha_nac) VALUES (?,?,?,?)";
+            try (PreparedStatement pstmt = conn.prepareStatement(SQL_QUERY)) {
+                pstmt.setInt(1, Est1.getCod());
+                pstmt.setInt(2, Est1.getCed());
+                pstmt.setString(3, Est1.getNombre());
+                pstmt.setString(4, Est1.getFecha());
+
+
+                int filasInsertadas = pstmt.executeUpdate();
+                if (filasInsertadas > 0) {
+                    mostrarMensajeExito("Estudiante registrado con éxito.");
+                    codigot.setText("");
+                    cedulat.setText("");
+                    nombret.setText("");
+                    fechat.setText("");
+                } else {
+                    mostrarMensajeError("Error al registrar al estudiante.");
+                }
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
     }
 
     private void limpiarFormulario() {
-
+        codigot.setText("");
+        cedulat.setText("");
+        nombret.setText("");
+        fechat.setText("");
     }
+
+
 }
